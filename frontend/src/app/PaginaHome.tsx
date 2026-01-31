@@ -1,8 +1,59 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Cabecalho } from '../componentes/Cabecalho';
+import { BarraTopo } from '../componentes/BarraTopo';
+import { ContainerPagina } from '../componentes/ContainerPagina';
+import { BotaoVerde } from '../componentes/BotaoVerde';
+import { Chip } from '../componentes/Chip';
 import { listarArtigos } from '../servicos/artigos';
 import { ArtigoResumo } from '../tipos/artigo';
+
+const TAGS_SUGERIDAS = ['Frontend', 'Backend', 'Mobile', 'DevOps', 'AI'];
+
+function IconeEditar() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M4 20h4l10.5-10.5-4-4L4 16v4z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path d="M13.5 6.5l4 4" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function PaginacaoNumerica({
+  paginaAtual,
+  totalPaginas,
+  onIrPara
+}: {
+  paginaAtual: number;
+  totalPaginas: number;
+  onIrPara: (p: number) => void;
+}) {
+  const paginas = useMemo(() => {
+    const max = Math.min(totalPaginas, 5);
+    return Array.from({ length: max }, (_, i) => i + 1);
+  }, [totalPaginas]);
+
+  return (
+    <div className="mt-10 flex items-center justify-center gap-3 text-xs text-slate-600">
+      {paginas.map((p) => (
+        <button
+          key={p}
+          type="button"
+          onClick={() => onIrPara(p)}
+          className={[
+            'grid h-8 w-8 place-items-center rounded-full',
+            p === paginaAtual ? 'bg-verdeClaro text-slate-900' : 'hover:bg-slate-100'
+          ].join(' ')}
+        >
+          {p}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function PaginaHome() {
   const [pagina, setPagina] = useState(1);
@@ -10,7 +61,7 @@ export function PaginaHome() {
   const [tag, setTag] = useState('');
   const [itens, setItens] = useState<ArtigoResumo[]>([]);
   const [total, setTotal] = useState(0);
-  const tamanho = 10;
+  const tamanho = 5;
 
   const totalPaginas = useMemo(() => Math.max(1, Math.ceil(total / tamanho)), [total]);
 
@@ -23,67 +74,84 @@ export function PaginaHome() {
   }, [pagina, busca, tag]);
 
   return (
-    <div className="min-h-screen bg-zinc-950">
-      <Cabecalho />
+    <div className="min-h-screen bg-fundo">
+      <BarraTopo />
 
-      <main className="mx-auto max-w-6xl px-4 py-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Artigos</h1>
-            <p className="mt-1 text-sm text-zinc-400">Home privada.</p>
-          </div>
+      <ContainerPagina>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="font-serif text-2xl font-semibold text-slate-900">Todos os artigos</h1>
 
-          <Link to="/artigos/novo" className="inline-flex items-center justify-center rounded-md bg-yellow-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-yellow-300">
-            Novo artigo
+          <Link to="/artigos/novo">
+            <BotaoVerde>Criar artigo</BotaoVerde>
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-3 md:grid-cols-2">
-          <input
-            className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-yellow-400"
-            placeholder="Buscar por título..."
-            value={busca}
-            onChange={(e) => { setPagina(1); setBusca(e.target.value); }}
-          />
-          <input
-            className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-yellow-400"
-            placeholder="Filtrar por tag..."
-            value={tag}
-            onChange={(e) => { setPagina(1); setTag(e.target.value); }}
-          />
-        </div>
-
-        <section className="mt-6 space-y-3">
-          {itens.map((a) => (
-            <Link key={a.id} to={`/artigos/${a.id}`} className="block rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4 hover:bg-zinc-900/50">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-base font-semibold">{a.titulo}</h2>
-                  <p className="mt-2 text-sm text-zinc-400">{a.resumo}</p>
-                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-300">
-                    <span className="rounded-full bg-zinc-800 px-2 py-1">{a.autor.nome}</span>
-                    {a.tagPrincipal ? <span className="rounded-full bg-yellow-400/10 px-2 py-1 text-yellow-300">{a.tagPrincipal}</span> : null}
-                  </div>
-                </div>
-                <span className="text-xs text-zinc-500">#{a.id}</span>
-              </div>
-            </Link>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {TAGS_SUGERIDAS.map((t) => (
+            <Chip
+              key={t}
+              texto={t}
+              ativo={tag.toLowerCase() === t.toLowerCase()}
+              onClick={() => {
+                setPagina(1);
+                setTag((atual) => (atual.toLowerCase() === t.toLowerCase() ? '' : t));
+              }}
+            />
           ))}
-          {itens.length === 0 ? <p className="text-sm text-zinc-400">Nenhum artigo encontrado.</p> : null}
-        </section>
-
-        <div className="mt-8 flex items-center justify-between">
-          <button className="rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800 disabled:opacity-60" disabled={pagina <= 1} onClick={() => setPagina((p) => Math.max(1, p - 1))}>
-            Anterior
-          </button>
-
-          <span className="text-sm text-zinc-400">Página {pagina} de {totalPaginas}</span>
-
-          <button className="rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800 disabled:opacity-60" disabled={pagina >= totalPaginas} onClick={() => setPagina((p) => p + 1)}>
-            Próxima
-          </button>
         </div>
-      </main>
+
+        <div className="mt-3">
+          <input
+            className="w-full rounded-md bg-verdeClaro px-4 py-3 text-xs text-slate-900 outline-none placeholder:text-slate-500"
+            placeholder="Pesquisar..."
+            value={busca}
+            onChange={(e) => {
+              setPagina(1);
+              setBusca(e.target.value);
+            }}
+          />
+        </div>
+
+        <div className="mt-4 overflow-hidden rounded-xl border border-borda">
+          {itens.map((a) => (
+            <div
+              key={a.id}
+              className="flex items-center gap-3 border-b border-borda px-3 py-3 last:border-b-0"
+            >
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-slate-200">
+                {a.imagemUrl ? (
+                  <img src={a.imagemUrl} alt="" className="h-full w-full object-cover" />
+                ) : null}
+              </div>
+
+              <Link to={`/artigos/${a.id}`} className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-slate-900">{a.titulo}</p>
+                <p className="mt-0.5 line-clamp-1 text-[11px] text-slate-600">{a.resumo}</p>
+                {a.tagPrincipal ? (
+                  <span className="mt-1 inline-block rounded-full bg-verdeClaro px-2 py-0.5 text-[10px] text-slate-700">
+                    {a.tagPrincipal}
+                  </span>
+                ) : null}
+              </Link>
+
+              <Link
+                to={`/artigos/${a.id}/editar`}
+                className="grid h-8 w-8 place-items-center rounded-md text-slate-600 hover:bg-slate-100"
+                aria-label="Editar"
+                title="Editar"
+              >
+                <IconeEditar />
+              </Link>
+            </div>
+          ))}
+
+          {itens.length === 0 ? (
+            <div className="px-3 py-6 text-center text-xs text-slate-600">Nenhum artigo encontrado.</div>
+          ) : null}
+        </div>
+
+        <PaginacaoNumerica paginaAtual={pagina} totalPaginas={totalPaginas} onIrPara={setPagina} />
+      </ContainerPagina>
     </div>
   );
 }

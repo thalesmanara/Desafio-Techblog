@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Cabecalho } from '../componentes/Cabecalho';
+import { BarraTopo } from '../componentes/BarraTopo';
+import { ContainerPagina } from '../componentes/ContainerPagina';
+import { BotaoVerde } from '../componentes/BotaoVerde';
 import { detalharArtigo, excluirArtigo } from '../servicos/artigos';
 import { ArtigoDetalhe } from '../tipos/artigo';
 
@@ -29,41 +31,71 @@ export function PaginaDetalheArtigo() {
     navigate('/home');
   }
 
-  return (
-    <div className="min-h-screen bg-zinc-950">
-      <Cabecalho />
-      <main className="mx-auto max-w-4xl px-4 py-6">
-        <Link to="/home" className="text-sm text-zinc-400 hover:text-zinc-200">← Voltar</Link>
+  const tagPrincipal = artigo?.tags.find((t) => t.principal)?.nome ?? '';
 
-        {erro ? <p className="mt-6 text-sm text-red-400">{erro}</p> : null}
-        {!artigo ? <p className="mt-6 text-sm text-zinc-400">Carregando...</p> : null}
+  return (
+    <div className="min-h-screen bg-fundo">
+      <BarraTopo />
+
+      <ContainerPagina>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="font-serif text-3xl font-semibold text-slate-900">
+              {artigo?.titulo ?? 'Carregando...'}
+            </h1>
+
+            {artigo ? (
+              <p className="mt-1 text-[11px] text-slate-500">
+                Publicado por {artigo.autor.nome} • {new Date(artigo.criadoEm).toLocaleDateString('pt-BR')}
+              </p>
+            ) : null}
+          </div>
+
+          {tagPrincipal ? (
+            <span className="shrink-0 rounded-full bg-verdeClaro px-3 py-1 text-[11px] text-slate-700">
+              {tagPrincipal}
+            </span>
+          ) : null}
+        </div>
+
+        {erro ? <p className="mt-6 text-xs text-red-600">{erro}</p> : null}
 
         {artigo ? (
-          <div className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div>
-                <h1 className="text-2xl font-semibold">{artigo.titulo}</h1>
-                <p className="mt-2 text-sm text-zinc-400">por {artigo.autor.nome}</p>
+          <>
+            <div className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{artigo.conteudo}</div>
+
+            <div className="mt-10">
+              <h2 className="text-sm font-semibold text-slate-900">Comentários</h2>
+
+              <textarea
+                className="mt-3 min-h-[90px] w-full rounded-md bg-verdeClaro px-4 py-3 text-xs text-slate-900 outline-none placeholder:text-slate-500"
+                placeholder="Escreva um comentário..."
+                disabled
+              />
+
+              <div className="mt-3">
+                <BotaoVerde disabled>Comentar</BotaoVerde>
               </div>
 
-              <div className="flex gap-2">
-                <Link to={`/artigos/${artigo.id}/editar`} className="rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800">Editar</Link>
-                <button onClick={remover} className="rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-300 hover:bg-red-500/20">Excluir</button>
-              </div>
+              <p className="mt-4 text-[11px] text-slate-500">
+                Comentários serão implementados no próximo commit (carregar 5 por vez e 1 nível de resposta).
+              </p>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {artigo.tags.map((t) => (
-                <span key={t.nome} className={['rounded-full px-2 py-1 text-xs', t.principal ? 'bg-yellow-400/10 text-yellow-300' : 'bg-zinc-800 text-zinc-200'].join(' ')}>
-                  {t.nome}
-                </span>
-              ))}
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link
+                to={`/artigos/${artigo.id}/editar`}
+                className="text-xs font-semibold text-verde hover:text-verdeEscuro"
+              >
+                Editar artigo
+              </Link>
+              <button onClick={remover} className="text-xs font-semibold text-red-600 hover:text-red-700">
+                Excluir artigo
+              </button>
             </div>
-
-            <pre className="mt-6 whitespace-pre-wrap font-sans text-sm leading-relaxed text-zinc-200">{artigo.conteudo}</pre>
-          </div>
+          </>
         ) : null}
-      </main>
+      </ContainerPagina>
     </div>
   );
 }

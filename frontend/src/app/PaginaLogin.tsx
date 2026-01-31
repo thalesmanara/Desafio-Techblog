@@ -1,5 +1,8 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BarraTopo } from '../componentes/BarraTopo';
+import { ContainerPagina } from '../componentes/ContainerPagina';
+import { BotaoVerde } from '../componentes/BotaoVerde';
 import { requisitar } from '../servicos/api';
 import { salvarToken } from '../servicos/autenticacao';
 
@@ -32,35 +35,49 @@ export function PaginaLogin() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950">
-      <div className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6">
-        <form onSubmit={entrar} className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-          <h1 className="text-xl font-semibold">Login</h1>
+    <div className="min-h-screen bg-fundo">
+      <BarraTopo />
 
-          <label className="mt-6 block text-sm text-zinc-200">E-mail</label>
-          <input
-            className="mt-2 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-yellow-400"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="username"
-          />
+      <ContainerPagina>
+        <div className="flex min-h-[70vh] items-center justify-center">
+          <form onSubmit={entrar} className="w-full max-w-sm">
+            <h1 className="text-center font-serif text-2xl font-semibold text-slate-900">
+              Bem-vindo de volta
+            </h1>
 
-          <label className="mt-4 block text-sm text-zinc-200">Senha</label>
-          <input
-            type="password"
-            className="mt-2 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-yellow-400"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            autoComplete="current-password"
-          />
+            <div className="mt-10">
+              <label className="text-xs font-semibold text-slate-700">Email</label>
+              <input
+                className="mt-2 w-full rounded-md bg-verdeClaro px-4 py-3 text-xs text-slate-900 outline-none placeholder:text-slate-500"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+              />
+            </div>
 
-          {erro ? <p className="mt-4 text-sm text-red-400">{erro}</p> : null}
+            <div className="mt-4">
+              <label className="text-xs font-semibold text-slate-700">Senha</label>
+              <input
+                type="password"
+                className="mt-2 w-full rounded-md bg-verdeClaro px-4 py-3 text-xs text-slate-900 outline-none placeholder:text-slate-500"
+                placeholder="Senha"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                autoComplete="current-password"
+              />
+            </div>
 
-          <button disabled={carregando} className="mt-6 w-full rounded-md bg-yellow-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-yellow-300 disabled:opacity-60">
-            {carregando ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
-      </div>
-    </main>
+            {erro ? <p className="mt-4 text-center text-xs text-red-600">{erro}</p> : null}
+
+            <div className="mt-6">
+              <BotaoVerde disabled={carregando} className="w-full py-2">
+                {carregando ? 'Entrando...' : 'Entrar'}
+              </BotaoVerde>
+            </div>
+          </form>
+        </div>
+      </ContainerPagina>
+    </div>
   );
 }

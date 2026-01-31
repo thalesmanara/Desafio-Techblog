@@ -1,17 +1,27 @@
 import { Link } from 'react-router-dom';
+import { BarraTopo } from '../componentes/BarraTopo';
+import { ContainerPagina } from '../componentes/ContainerPagina';
+import { BotaoVerde } from '../componentes/BotaoVerde';
 
 export function PaginaLanding() {
   return (
-    <main className="min-h-screen bg-zinc-950">
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-3xl font-bold leading-tight md:text-5xl">TechBlog</h1>
-        <p className="mt-4 max-w-xl text-zinc-300">
-          Um MVP simples para leitura e gestão de artigos, com autenticação e CRUD completo.
-        </p>
-        <Link to="/login" className="mt-8 inline-flex items-center justify-center rounded-md bg-yellow-400 px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-yellow-300">
-          Entrar
-        </Link>
-      </div>
-    </main>
+    <div className="min-h-screen bg-fundo">
+      <BarraTopo mostrarEntrar />
+
+      <ContainerPagina>
+        <div className="flex min-h-[70vh] flex-col items-center justify-center text-center">
+          <h1 className="font-serif text-5xl font-semibold tracking-tight text-slate-900 md:text-6xl">
+            Insights &amp; Learning
+          </h1>
+          <p className="mt-4 max-w-xl text-sm text-slate-600">
+            Explorando tendências Tech, um post por vez
+          </p>
+
+          <Link to="/login" className="mt-8">
+            <BotaoVerde className="px-6 py-2">Começar a ler</BotaoVerde>
+          </Link>
+        </div>
+      </ContainerPagina>
+    </div>
   );
 }

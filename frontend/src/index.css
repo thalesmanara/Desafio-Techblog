@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
+:root { color-scheme: light; }
+
 * { box-sizing: border-box; }
-a { text-decoration: none; }
+
+html, body { height: 100%; }
+
+a { text-decoration: none; color: inherit; }

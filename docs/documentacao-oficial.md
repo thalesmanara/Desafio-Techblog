@@ -88,3 +88,14 @@ Regras:
 - Para o frontend (porta 5173) conseguir chamar a API (porta 3000), o backend libera CORS para uma origem configurável via `CORS_ORIGEM`.
 - Padrão local: `http://localhost:5173`.
 
+## Layout (UI)
+
+O frontend usa Tailwind com um conjunto pequeno de cores customizadas para reproduzir o layout:
+- `verde`: botões e ações principais
+- `verdeClaro`: fundos de inputs/textarea e chips ativos
+- títulos usam `font-serif` para aproximar do layout
+
+Componentes base:
+- `BarraTopo`: topo com logo e ação de entrar/sair
+- `ContainerPagina`: centraliza e controla largura máxima
+- `BotaoVerde` e `Chip`: padrões visuais reutilizados
