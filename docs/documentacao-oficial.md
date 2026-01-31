@@ -106,3 +106,23 @@ Componentes base:
 
 - O detalhe do artigo exibe comentários com paginação de 5 em 5 e botão "Ver mais comentários".
 - Respostas têm apenas 1 nível (responde apenas comentários de topo), seguindo o requisito do desafio.
+
+### Tag principal (frontend)
+
+- Em criar/editar artigo, o campo "Tag principal" é um `select` alimentado pelas tags digitadas (separadas por vírgula).
+- Isso evita inconsistência (tag principal fora da lista de tags) e reduz validações complexas no backend para o MVP.
+
+
+### Correção JSX do select
+
+- Ajustado o componente `select` de Tag principal para evitar erro de build (JSX inválido).
+
+
+### Bugfix: Tag principal
+
+- Corrigido erro no formulário de criar/editar: o select referenciava variáveis inexistentes (`opcoesTags`, `tagPrincipalValida`). Agora as opções são derivadas de `tagsFinal`.
+
+
+### Tag principal na Home
+
+- A listagem (Home) busca a tag principal com um `ORDER BY t.nome ASC` na subquery para garantir consistência caso existam múltiplas tags marcadas como principal por dados legados.

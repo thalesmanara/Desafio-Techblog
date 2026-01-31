@@ -91,6 +91,7 @@ export async function listarArtigos(caminhoBanco: string, filtros: FiltrosListag
           FROM artigos_tags at2
           JOIN tags t ON t.id = at2.tag_id
           WHERE at2.artigo_id = a.id AND at2.principal = 1
+          ORDER BY t.nome ASC
           LIMIT 1
         ) as tag_principal
       FROM artigos a

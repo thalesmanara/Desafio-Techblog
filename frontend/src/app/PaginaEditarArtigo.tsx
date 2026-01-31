@@ -33,6 +33,13 @@ export function PaginaEditarArtigo() {
     return combinadas;
   }, [tagsTexto, tagsSelecionadas]);
 
+  const opcoesTags = useMemo(() => {
+    return tagsFinal.map((t) => t.trim()).filter(Boolean);
+  }, [tagsFinal]);
+
+  const tagPrincipalValida = !tagPrincipal || opcoesTags.includes(tagPrincipal);
+
+
   useEffect(() => {
     (async () => {
       try {
@@ -147,12 +154,18 @@ export function PaginaEditarArtigo() {
 
             <div className="mt-3">
               <label className="text-xs font-semibold text-slate-700">Tag principal</label>
-              <input
-                className="mt-2 w-full rounded-md bg-verdeClaro px-4 py-3 text-xs text-slate-900 outline-none placeholder:text-slate-500"
-                placeholder="Ex: Frontend"
-                value={tagPrincipal}
-                onChange={(e) => setTagPrincipal(e.target.value)}
-              />
+              <select
+  className="mt-3 w-full rounded-md bg-verdeClaro px-4 py-3 text-xs text-slate-900 outline-none"
+  value={tagPrincipalValida ? tagPrincipal : ''}
+  onChange={(e) => setTagPrincipal(e.target.value)}
+>
+  <option value="">Selecione</option>
+  {opcoesTags.map((t) => (
+    <option key={t} value={t}>
+      {t}
+    </option>
+  ))}
+</select>
               <p className="mt-1 text-[11px] text-slate-500">A tag principal deve estar dentro das tags selecionadas.</p>
             </div>
           </div>
