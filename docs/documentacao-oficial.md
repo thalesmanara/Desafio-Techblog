@@ -16,3 +16,9 @@ Para manter a instalação simples no Windows, foi usada a biblioteca `sql.js` (
 
 A carga inicial lê `backend/dados/artigos-iniciais.json` e cria usuários (a partir dos autores), artigos e tags/relacionamentos.
 A senha padrão dos usuários é definida por `SENHA_PADRAO_USUARIOS` no `.env`.
+
+## Login
+
+- Endpoint: `POST /api/autenticacao/login`
+- Body: `{ "email": "...", "senha": "..." }`
+- Resposta: `{ token, usuario }`
