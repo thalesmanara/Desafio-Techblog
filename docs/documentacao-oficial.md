@@ -22,3 +22,10 @@ A senha padrão dos usuários é definida por `SENHA_PADRAO_USUARIOS` no `.env`.
 - Endpoint: `POST /api/autenticacao/login`
 - Body: `{ "email": "...", "senha": "..." }`
 - Resposta: `{ token, usuario }`
+
+## Artigos (listagem)
+
+- Endpoint: `GET /api/artigos`
+- Protegido por JWT
+- Query params: `pagina`, `tamanho`, `busca`, `tag`
+- Retorno: `{ itens, pagina, tamanho, total }`

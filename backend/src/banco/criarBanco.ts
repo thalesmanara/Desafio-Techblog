@@ -18,7 +18,6 @@ function obterCaminhoSchema(): string {
 async function criarBancoEAplicarSchema(): Promise<void> {
   const caminhoBanco = obterCaminhoBanco();
   const caminhoSchema = obterCaminhoSchema();
-
   if (!fs.existsSync(caminhoSchema)) throw new Error(`Schema não encontrado em: ${caminhoSchema}`);
 
   const schemaSql = fs.readFileSync(caminhoSchema, 'utf-8');

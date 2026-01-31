@@ -12,9 +12,7 @@ export async function inicializarSqlJs(): Promise<void> {
 }
 
 function garantirInicializado(): SqlJsStatic {
-  if (!sqlJs) {
-    throw new Error('SQL.js não foi inicializado. Chame inicializarSqlJs() antes.');
-  }
+  if (!sqlJs) throw new Error('SQL.js não foi inicializado. Chame inicializarSqlJs() antes.');
   return sqlJs;
 }
 
