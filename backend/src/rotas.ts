@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import rotasAutenticacao from './modulos/autenticacao/rotasAutenticacao';
 import rotasArtigos from './modulos/artigos/rotasArtigos';
+import rotasComentarios from './modulos/comentarios/rotasComentarios';
 
 const rotas = Router();
 
@@ -10,5 +11,6 @@ rotas.get('/health', (req, res) => {
 
 rotas.use('/api/autenticacao', rotasAutenticacao);
 rotas.use('/api/artigos', rotasArtigos);
+rotas.use(rotasComentarios);
 
 export default rotas;

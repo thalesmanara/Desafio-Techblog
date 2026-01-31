@@ -61,3 +61,17 @@ Como o acesso ao SQLite é feito via `sql.js` (WASM), operações de escrita (cr
 - Protegido por JWT
 - Regra: somente o autor do artigo pode excluir
 - Retorna: `{ ok: true }`
+
+## Comentários
+
+- Listagem: `GET /api/artigos/:artigoId/comentarios?pagina=1&tamanho=5`
+  - Retorna somente comentários de topo (paginados) e inclui as respostas (1 nível) dentro de cada item.
+- Criar comentário: `POST /api/artigos/:artigoId/comentarios`
+  - Body: `{ conteudo }`
+- Responder (1 nível): `POST /api/artigos/:artigoId/comentarios/:comentarioId/respostas`
+  - Body: `{ conteudo }`
+
+Regras:
+- Privado (exige JWT).
+- Paginação default de 5 comentários de topo por página (ideal para botão “Ver mais”).
+- Não permite resposta de resposta (evita árvore infinita).
