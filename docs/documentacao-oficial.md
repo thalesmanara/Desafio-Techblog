@@ -82,3 +82,9 @@ Regras:
 - Rotas públicas: `/` (landing) e `/login`.
 - Rotas privadas: `/home`, `/artigos/:id`, `/artigos/novo`, `/artigos/:id/editar`.
 - `VITE_API_URL` aponta para o backend.
+
+## CORS (desenvolvimento)
+
+- Para o frontend (porta 5173) conseguir chamar a API (porta 3000), o backend libera CORS para uma origem configurável via `CORS_ORIGEM`.
+- Padrão local: `http://localhost:5173`.
+
