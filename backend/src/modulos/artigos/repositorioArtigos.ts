@@ -1,4 +1,4 @@
-import { abrirBanco, inicializarSqlJs } from '../../banco/conexao';
+import { abrirBanco, inicializarSqlJs, salvarBanco } from '../../banco/conexao';
 
 export type ArtigoResumo = {
   id: number;
@@ -194,6 +194,146 @@ export async function buscarArtigoPorId(caminhoBanco: string, id: number): Promi
       autor: { id: Number(r.autor_id), nome: String(r.autor_nome), email: String(r.autor_email) },
       tags
     };
+  } finally {
+    db.close();
+  }
+}
+
+
+export type ArtigoCriado = { id: number };
+
+export async function criarArtigo(
+  caminhoBanco: string,
+  dados: { titulo: string; conteudo: string; imagemUrl: string | null; autorId: number; tags: string[]; tagPrincipal: string }
+): Promise<ArtigoCriado> {
+  await inicializarSqlJs();
+  const db = abrirBanco(caminhoBanco);
+
+  try {
+    db.run('BEGIN;');
+
+    // Gerar id simples: max(id) + 1 (mantém compatível com seed, que usa ids do JSON)
+    const resMax = db.exec('SELECT COALESCE(MAX(id), 0) as max_id FROM artigos;');
+    const maxId = resMax.length ? Number(resMax[0].values[0][0]) : 0;
+    const novoId = maxId + 1;
+
+    const agora = new Date().toISOString();
+
+    const stmtArtigo = db.prepare(
+      'INSERT INTO artigos (id, titulo, conteudo, imagem_url, autor_id, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, ?, ?);'
+    );
+    stmtArtigo.run([novoId, dados.titulo, dados.conteudo, dados.imagemUrl, dados.autorId, agora, agora]);
+    stmtArtigo.free();
+
+    // Inserir/garantir tags
+    const stmtInserirTag = db.prepare('INSERT OR IGNORE INTO tags (nome) VALUES (?);');
+    for (const tag of dados.tags) stmtInserirTag.run([tag]);
+    stmtInserirTag.free();
+
+    // Mapear tag -> id
+    const stmtBuscarTag = db.prepare('SELECT id FROM tags WHERE nome = ? LIMIT 1;');
+
+    const stmtInserirRel = db.prepare(
+      'INSERT OR REPLACE INTO artigos_tags (artigo_id, tag_id, principal) VALUES (?, ?, ?);'
+    );
+
+    for (const tag of dados.tags) {
+      stmtBuscarTag.bind([tag]);
+      if (stmtBuscarTag.step()) {
+        const obj = stmtBuscarTag.getAsObject() as any;
+        const tagId = Number(obj.id);
+        const principal = tag === dados.tagPrincipal ? 1 : 0;
+        stmtInserirRel.run([novoId, tagId, principal]);
+      }
+      stmtBuscarTag.reset();
+    }
+
+    stmtBuscarTag.free();
+    stmtInserirRel.free();
+
+    db.run('COMMIT;');
+    salvarBanco(db, caminhoBanco);
+    return { id: novoId };
+  } catch (e) {
+    try { db.run('ROLLBACK;'); } catch {}
+    throw e;
+  } finally {
+    db.close();
+  }
+}
+
+
+export type ResultadoAtualizacao = { encontrado: boolean; permitido: boolean };
+
+export async function atualizarArtigo(
+  caminhoBanco: string,
+  id: number,
+  dados: { titulo: string; conteudo: string; imagemUrl: string | null; autorId: number; tags: string[]; tagPrincipal: string }
+): Promise<ResultadoAtualizacao> {
+  await inicializarSqlJs();
+  const db = abrirBanco(caminhoBanco);
+
+  try {
+    // Verifica existência e autor
+    const stmtExiste = db.prepare('SELECT autor_id as autor_id FROM artigos WHERE id = ? LIMIT 1;');
+    stmtExiste.bind([id]);
+    if (!stmtExiste.step()) {
+      stmtExiste.free();
+      return { encontrado: false, permitido: false };
+    }
+    const obj = stmtExiste.getAsObject() as any;
+    const autorIdDoBanco = Number(obj.autor_id);
+    stmtExiste.free();
+
+    if (autorIdDoBanco !== dados.autorId) {
+      return { encontrado: true, permitido: false };
+    }
+
+    db.run('BEGIN;');
+
+    const agora = new Date().toISOString();
+
+    const stmtAtualizar = db.prepare(
+      'UPDATE artigos SET titulo = ?, conteudo = ?, imagem_url = ?, atualizado_em = ? WHERE id = ?;'
+    );
+    stmtAtualizar.run([dados.titulo, dados.conteudo, dados.imagemUrl, agora, id]);
+    stmtAtualizar.free();
+
+    // Atualiza tags (remove relações antigas e cria novas)
+    const stmtLimparRel = db.prepare('DELETE FROM artigos_tags WHERE artigo_id = ?;');
+    stmtLimparRel.run([id]);
+    stmtLimparRel.free();
+
+    const stmtInserirTag = db.prepare('INSERT OR IGNORE INTO tags (nome) VALUES (?);');
+    for (const tag of dados.tags) stmtInserirTag.run([tag]);
+    stmtInserirTag.free();
+
+    const stmtBuscarTag = db.prepare('SELECT id FROM tags WHERE nome = ? LIMIT 1;');
+    const stmtInserirRel = db.prepare(
+      'INSERT OR REPLACE INTO artigos_tags (artigo_id, tag_id, principal) VALUES (?, ?, ?);'
+    );
+
+    for (const tag of dados.tags) {
+      stmtBuscarTag.bind([tag]);
+      if (stmtBuscarTag.step()) {
+        const t = stmtBuscarTag.getAsObject() as any;
+        const tagId = Number(t.id);
+        const principal = tag === dados.tagPrincipal ? 1 : 0;
+        stmtInserirRel.run([id, tagId, principal]);
+      }
+      stmtBuscarTag.reset();
+    }
+
+    stmtBuscarTag.free();
+    stmtInserirRel.free();
+
+    db.run('COMMIT;');
+    salvarBanco(db, caminhoBanco);
+
+    return { encontrado: true, permitido: true };
+  } catch (e) {
+    try { db.run('ROLLBACK;'); } catch {}
+    throw e;
   } finally {
     db.close();
   }

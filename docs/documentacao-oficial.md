@@ -35,3 +35,22 @@ A senha padrão dos usuários é definida por `SENHA_PADRAO_USUARIOS` no `.env`.
 - Endpoint: `GET /api/artigos/:id`
 - Protegido por JWT
 - Retorna: artigo completo + autor + tags (com indicação de principal)
+
+## Artigos (criação)
+
+- Endpoint: `POST /api/artigos`
+- Protegido por JWT
+- Body: `{ titulo, conteudo, imagemUrl?, tags: string[], tagPrincipal? }`
+- Retorna: `{ id }`
+
+## Persistência no SQLite (sql.js)
+
+Como o acesso ao SQLite é feito via `sql.js` (WASM), operações de escrita (criar/editar/excluir) precisam exportar e salvar o arquivo `.sqlite` após o `COMMIT`.
+
+## Artigos (edição)
+
+- Endpoint: `PUT /api/artigos/:id`
+- Protegido por JWT
+- Regra: somente o autor do artigo pode editar
+- Body: `{ titulo, conteudo, imagemUrl?, tags: string[], tagPrincipal? }`
+- Retorna: `{ ok: true }`
