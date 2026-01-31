@@ -99,3 +99,10 @@ Componentes base:
 - `BarraTopo`: topo com logo e ação de entrar/sair
 - `ContainerPagina`: centraliza e controla largura máxima
 - `BotaoVerde` e `Chip`: padrões visuais reutilizados
+
+### Frontend - Comentários
+
+- No detalhe do artigo, o formulário permite criar comentário e responder (1 nível).
+
+- O detalhe do artigo exibe comentários com paginação de 5 em 5 e botão "Ver mais comentários".
+- Respostas têm apenas 1 nível (responde apenas comentários de topo), seguindo o requisito do desafio.

@@ -5,6 +5,7 @@ import { ContainerPagina } from '../componentes/ContainerPagina';
 import { BotaoVerde } from '../componentes/BotaoVerde';
 import { detalharArtigo, excluirArtigo } from '../servicos/artigos';
 import { ArtigoDetalhe } from '../tipos/artigo';
+import { ComentariosArtigo } from '../componentes/ComentariosArtigo';
 
 export function PaginaDetalheArtigo() {
   const params = useParams();
@@ -63,24 +64,7 @@ export function PaginaDetalheArtigo() {
         {artigo ? (
           <>
             <div className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{artigo.conteudo}</div>
-
-            <div className="mt-10">
-              <h2 className="text-sm font-semibold text-slate-900">Comentários</h2>
-
-              <textarea
-                className="mt-3 min-h-[90px] w-full rounded-md bg-verdeClaro px-4 py-3 text-xs text-slate-900 outline-none placeholder:text-slate-500"
-                placeholder="Escreva um comentário..."
-                disabled
-              />
-
-              <div className="mt-3">
-                <BotaoVerde disabled>Comentar</BotaoVerde>
-              </div>
-
-              <p className="mt-4 text-[11px] text-slate-500">
-                Comentários serão implementados no próximo commit (carregar 5 por vez e 1 nível de resposta).
-              </p>
-            </div>
+            <ComentariosArtigo artigoId={artigo.id} />
 
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
