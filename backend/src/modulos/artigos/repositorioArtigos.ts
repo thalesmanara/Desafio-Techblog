@@ -338,3 +338,43 @@ export async function atualizarArtigo(
     db.close();
   }
 }
+
+
+export type ResultadoExclusao = { encontrado: boolean; permitido: boolean };
+
+export async function excluirArtigo(caminhoBanco: string, id: number, autorId: number): Promise<ResultadoExclusao> {
+  await inicializarSqlJs();
+  const db = abrirBanco(caminhoBanco);
+
+  try {
+    const stmtExiste = db.prepare('SELECT autor_id as autor_id FROM artigos WHERE id = ? LIMIT 1;');
+    stmtExiste.bind([id]);
+    if (!stmtExiste.step()) {
+      stmtExiste.free();
+      return { encontrado: false, permitido: false };
+    }
+    const obj = stmtExiste.getAsObject() as any;
+    const autorIdDoBanco = Number(obj.autor_id);
+    stmtExiste.free();
+
+    if (autorIdDoBanco !== autorId) {
+      return { encontrado: true, permitido: false };
+    }
+
+    db.run('BEGIN;');
+
+    const stmtDel = db.prepare('DELETE FROM artigos WHERE id = ?;');
+    stmtDel.run([id]);
+    stmtDel.free();
+
+    db.run('COMMIT;');
+    salvarBanco(db, caminhoBanco);
+
+    return { encontrado: true, permitido: true };
+  } catch (e) {
+    try { db.run('ROLLBACK;'); } catch {}
+    throw e;
+  } finally {
+    db.close();
+  }
+}

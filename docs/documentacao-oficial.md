@@ -54,3 +54,10 @@ Como o acesso ao SQLite é feito via `sql.js` (WASM), operações de escrita (cr
 - Regra: somente o autor do artigo pode editar
 - Body: `{ titulo, conteudo, imagemUrl?, tags: string[], tagPrincipal? }`
 - Retorna: `{ ok: true }`
+
+## Artigos (exclusão)
+
+- Endpoint: `DELETE /api/artigos/:id`
+- Protegido por JWT
+- Regra: somente o autor do artigo pode excluir
+- Retorna: `{ ok: true }`

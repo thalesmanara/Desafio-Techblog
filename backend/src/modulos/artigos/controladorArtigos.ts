@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { atualizarArtigo, buscarArtigoPorId, criarArtigo, listarArtigos, parsearFiltrosListagem } from './repositorioArtigos';
+import { atualizarArtigo, buscarArtigoPorId, criarArtigo, excluirArtigo, listarArtigos, parsearFiltrosListagem } from './repositorioArtigos';
 import { validarCriacaoArtigo, validarEdicaoArtigo } from '../../utils/validarArtigo';
 
 function obterCaminhoBanco(): string {
@@ -97,6 +97,34 @@ export async function editar(req: Request, res: Response): Promise<void> {
 
   if (!resultado.permitido) {
     res.status(403).json({ mensagem: 'Você não tem permissão para editar este artigo.' });
+    return;
+  }
+
+  res.json({ ok: true });
+}
+
+
+export async function excluir(req: Request, res: Response): Promise<void> {
+  if (!req.usuario) {
+    res.status(401).json({ mensagem: 'Não autenticado.' });
+    return;
+  }
+
+  const id = parsearId(req.params.id);
+  if (!id) {
+    res.status(400).json({ mensagem: 'Id inválido.' });
+    return;
+  }
+
+  const resultado = await excluirArtigo(obterCaminhoBanco(), id, req.usuario.id);
+
+  if (!resultado.encontrado) {
+    res.status(404).json({ mensagem: 'Artigo não encontrado.' });
+    return;
+  }
+
+  if (!resultado.permitido) {
+    res.status(403).json({ mensagem: 'Você não tem permissão para excluir este artigo.' });
     return;
   }
 

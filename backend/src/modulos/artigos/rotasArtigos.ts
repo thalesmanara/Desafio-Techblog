@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { autenticarUsuario } from '../../middlewares/autenticarUsuario';
-import { criar, detalhar, editar, listar } from './controladorArtigos';
+import { criar, detalhar, editar, excluir, listar } from './controladorArtigos';
 
 const rotasArtigos = Router();
 
@@ -15,6 +15,10 @@ rotasArtigos.post('/', autenticarUsuario, (req, res) => {
 
 rotasArtigos.put('/:id', autenticarUsuario, (req, res) => {
   editar(req, res);
+});
+
+rotasArtigos.delete('/:id', autenticarUsuario, (req, res) => {
+  excluir(req, res);
 });
 
 rotasArtigos.get('/:id', autenticarUsuario, (req, res) => {
