@@ -2,11 +2,13 @@
   "name": "techblog-backend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "banco:criar": "tsx src/banco/criarBanco.ts"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "dotenv": "^16.4.5"
+    "sql.js": "^1.10.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
