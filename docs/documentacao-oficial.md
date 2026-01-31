@@ -75,3 +75,10 @@ Regras:
 - Privado (exige JWT).
 - Paginação default de 5 comentários de topo por página (ideal para botão “Ver mais”).
 - Não permite resposta de resposta (evita árvore infinita).
+
+## Frontend
+
+- Stack: React + Vite + TypeScript + Tailwind + React Router.
+- Rotas públicas: `/` (landing) e `/login`.
+- Rotas privadas: `/home`, `/artigos/:id`, `/artigos/novo`, `/artigos/:id/editar`.
+- `VITE_API_URL` aponta para o backend.
