@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "banco:criar": "tsx src/banco/criarBanco.ts"
+    "banco:criar": "tsx src/banco/criarBanco.ts",
+    "banco:seed": "tsx src/banco/seed.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

@@ -7,9 +7,7 @@ dotenv.config();
 
 function obterCaminhoBanco(): string {
   const caminho = process.env.CAMINHO_BANCO;
-  if (!caminho) {
-    throw new Error('Variável CAMINHO_BANCO não definida no .env');
-  }
+  if (!caminho) throw new Error('Variável CAMINHO_BANCO não definida no .env');
   return caminho;
 }
 
@@ -21,9 +19,7 @@ async function criarBancoEAplicarSchema(): Promise<void> {
   const caminhoBanco = obterCaminhoBanco();
   const caminhoSchema = obterCaminhoSchema();
 
-  if (!fs.existsSync(caminhoSchema)) {
-    throw new Error(`Schema não encontrado em: ${caminhoSchema}`);
-  }
+  if (!fs.existsSync(caminhoSchema)) throw new Error(`Schema não encontrado em: ${caminhoSchema}`);
 
   const schemaSql = fs.readFileSync(caminhoSchema, 'utf-8');
 

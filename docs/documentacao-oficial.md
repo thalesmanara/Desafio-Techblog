@@ -11,3 +11,8 @@
 ## Observação de compatibilidade
 
 Para manter a instalação simples no Windows, foi usada a biblioteca `sql.js` (WASM) para acessar SQLite sem exigir ferramentas de compilação.
+
+## Banco e carga inicial
+
+A carga inicial lê `backend/dados/artigos-iniciais.json` e cria usuários (a partir dos autores), artigos e tags/relacionamentos.
+A senha padrão dos usuários é definida por `SENHA_PADRAO_USUARIOS` no `.env`.
