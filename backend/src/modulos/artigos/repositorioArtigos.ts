@@ -124,3 +124,77 @@ export async function listarArtigos(caminhoBanco: string, filtros: FiltrosListag
     db.close();
   }
 }
+
+
+export type ArtigoDetalhe = {
+  id: number;
+  titulo: string;
+  conteudo: string;
+  imagemUrl: string | null;
+  criadoEm: string;
+  atualizadoEm: string;
+  autor: { id: number; nome: string; email: string };
+  tags: { nome: string; principal: boolean }[];
+};
+
+export async function buscarArtigoPorId(caminhoBanco: string, id: number): Promise<ArtigoDetalhe | null> {
+  await inicializarSqlJs();
+  const db = abrirBanco(caminhoBanco);
+
+  try {
+    const stmtArtigo = db.prepare(`
+      SELECT
+        a.id,
+        a.titulo,
+        a.conteudo,
+        a.imagem_url,
+        a.criado_em,
+        a.atualizado_em,
+        u.id as autor_id,
+        u.nome as autor_nome,
+        u.email as autor_email
+      FROM artigos a
+      JOIN usuarios u ON u.id = a.autor_id
+      WHERE a.id = ?
+      LIMIT 1;
+    `);
+
+    stmtArtigo.bind([id]);
+    if (!stmtArtigo.step()) {
+      stmtArtigo.free();
+      return null;
+    }
+
+    const r = stmtArtigo.getAsObject() as any;
+    stmtArtigo.free();
+
+    const stmtTags = db.prepare(`
+      SELECT t.nome as nome, at.principal as principal
+      FROM artigos_tags at
+      JOIN tags t ON t.id = at.tag_id
+      WHERE at.artigo_id = ?
+      ORDER BY at.principal DESC, t.nome ASC;
+    `);
+
+    stmtTags.bind([id]);
+    const tags: { nome: string; principal: boolean }[] = [];
+    while (stmtTags.step()) {
+      const tr = stmtTags.getAsObject() as any;
+      tags.push({ nome: String(tr.nome), principal: Number(tr.principal) === 1 });
+    }
+    stmtTags.free();
+
+    return {
+      id: Number(r.id),
+      titulo: String(r.titulo),
+      conteudo: String(r.conteudo),
+      imagemUrl: r.imagem_url ? String(r.imagem_url) : null,
+      criadoEm: String(r.criado_em),
+      atualizadoEm: String(r.atualizado_em),
+      autor: { id: Number(r.autor_id), nome: String(r.autor_nome), email: String(r.autor_email) },
+      tags
+    };
+  } finally {
+    db.close();
+  }
+}

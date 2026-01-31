@@ -29,3 +29,9 @@ A senha padrão dos usuários é definida por `SENHA_PADRAO_USUARIOS` no `.env`.
 - Protegido por JWT
 - Query params: `pagina`, `tamanho`, `busca`, `tag`
 - Retorno: `{ itens, pagina, tamanho, total }`
+
+## Artigos (detalhe)
+
+- Endpoint: `GET /api/artigos/:id`
+- Protegido por JWT
+- Retorna: artigo completo + autor + tags (com indicação de principal)
