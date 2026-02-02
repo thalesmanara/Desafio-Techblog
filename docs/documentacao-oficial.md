@@ -1,138 +1,163 @@
-# Documentação Oficial
+# TechBlog MVP — Documentação Oficial
 
-## Decisões iniciais
+## Visão geral
 
-- Backend: Express + TypeScript
-- Banco: SQLite (arquivo local)
-- Autenticação: JWT (sem cadastro)
-- Frontend: React + Vite + Tailwind
-- Sem Docker
+Aplicação full stack de um blog técnico com:
+- autenticação via JWT (login com usuário pré-carregado via seed)
+- CRUD completo de artigos (listar, detalhar, criar, editar, excluir)
+- tags múltiplas por artigo (exibe a tag principal)
+- comentários com paginação (5 em 5) e respostas com 1 nível (sem árvore infinita)
 
-## Observação de compatibilidade
+O foco é um MVP simples, seguro e compatível com um desafio de nível júnior.
 
-Para manter a instalação simples no Windows, foi usada a biblioteca `sql.js` (WASM) para acessar SQLite sem exigir ferramentas de compilação.
+---
 
-## Banco e carga inicial
+## Stack e justificativas
 
-A carga inicial lê `backend/dados/artigos-iniciais.json` e cria usuários (a partir dos autores), artigos e tags/relacionamentos.
-A senha padrão dos usuários é definida por `SENHA_PADRAO_USUARIOS` no `.env`.
+### Backend
+- **Node.js + Express + TypeScript**
+  - Express é simples, popular e adequado para API REST.
+  - TypeScript melhora a segurança do código (tipos) sem adicionar muita complexidade.
+- **SQLite**
+  - Banco local leve, ideal para desafio e execução sem Docker.
+  - Arquivo único de banco facilita setup e demonstração.
+- **JWT**
+  - Implementa autenticação stateless com baixa complexidade.
+  - Compatível com frontend simples e rotas protegidas.
 
-## Login
+### Frontend
+- **Vite + React + TypeScript**
+  - Setup rápido, boa DX e comum em desafios.
+- **Tailwind CSS**
+  - Facilita aproximar o layout do Figma rapidamente com poucas dependências.
+- **Fetch API**
+  - Evita bibliotecas extras para manter o projeto enxuto.
 
-- Endpoint: `POST /api/autenticacao/login`
-- Body: `{ "email": "...", "senha": "..." }`
-- Resposta: `{ token, usuario }`
+### Decisões para manter o projeto “mínimo”
+- Sem Docker (reduz fricção de instalação).
+- Sem Prisma/ORM (para o MVP, SQL simples e repositório enxuto são suficientes).
+- Sem tela de criação de usuários (usuários são carregados via seed).
 
-## Artigos (listagem)
+---
 
-- Endpoint: `GET /api/artigos`
-- Protegido por JWT
-- Query params: `pagina`, `tamanho`, `busca`, `tag`
-- Retorno: `{ itens, pagina, tamanho, total }`
+## Regras de negócio implementadas
 
-## Artigos (detalhe)
+### Autenticação
+- Login via e-mail e senha pré-existentes no banco (seed).
+- JWT emitido no login.
+- Rotas privadas exigem header:
+  - `Authorization: Bearer <token>`
 
-- Endpoint: `GET /api/artigos/:id`
-- Protegido por JWT
-- Retorna: artigo completo + autor + tags (com indicação de principal)
+### Artigos
+- CRUD completo.
+- Apenas o **autor** pode **editar** e **excluir**.
+- Tags:
+  - múltiplas tags por artigo
+  - uma tag marcada como **principal**
+  - na Home exibimos a **tag principal**
+- Busca simples na Home (texto).
 
-## Artigos (criação)
+### Comentários
+- Lista inicial: 5 comentários.
+- Botão “Ver mais comentários”: carrega mais 5.
+- Respostas: apenas 1 nível (comentário → respostas).
 
-- Endpoint: `POST /api/artigos`
-- Protegido por JWT
-- Body: `{ titulo, conteudo, imagemUrl?, tags: string[], tagPrincipal? }`
-- Retorna: `{ id }`
-
-## Persistência no SQLite (sql.js)
-
-Como o acesso ao SQLite é feito via `sql.js` (WASM), operações de escrita (criar/editar/excluir) precisam exportar e salvar o arquivo `.sqlite` após o `COMMIT`.
-
-## Artigos (edição)
-
-- Endpoint: `PUT /api/artigos/:id`
-- Protegido por JWT
-- Regra: somente o autor do artigo pode editar
-- Body: `{ titulo, conteudo, imagemUrl?, tags: string[], tagPrincipal? }`
-- Retorna: `{ ok: true }`
-
-## Artigos (exclusão)
-
-- Endpoint: `DELETE /api/artigos/:id`
-- Protegido por JWT
-- Regra: somente o autor do artigo pode excluir
-- Retorna: `{ ok: true }`
-
-## Comentários
-
-- Listagem: `GET /api/artigos/:artigoId/comentarios?pagina=1&tamanho=5`
-  - Retorna somente comentários de topo (paginados) e inclui as respostas (1 nível) dentro de cada item.
-- Criar comentário: `POST /api/artigos/:artigoId/comentarios`
-  - Body: `{ conteudo }`
-- Responder (1 nível): `POST /api/artigos/:artigoId/comentarios/:comentarioId/respostas`
-  - Body: `{ conteudo }`
-
-Regras:
-- Privado (exige JWT).
-- Paginação default de 5 comentários de topo por página (ideal para botão “Ver mais”).
-- Não permite resposta de resposta (evita árvore infinita).
-
-## Frontend
-
-- Stack: React + Vite + TypeScript + Tailwind + React Router.
-- Rotas públicas: `/` (landing) e `/login`.
-- Rotas privadas: `/home`, `/artigos/:id`, `/artigos/novo`, `/artigos/:id/editar`.
-- `VITE_API_URL` aponta para o backend.
-
-## CORS (desenvolvimento)
-
-- Para o frontend (porta 5173) conseguir chamar a API (porta 3000), o backend libera CORS para uma origem configurável via `CORS_ORIGEM`.
-- Padrão local: `http://localhost:5173`.
-
-## Layout (UI)
-
-O frontend usa Tailwind com um conjunto pequeno de cores customizadas para reproduzir o layout:
-- `verde`: botões e ações principais
-- `verdeClaro`: fundos de inputs/textarea e chips ativos
-- títulos usam `font-serif` para aproximar do layout
-
-Componentes base:
-- `BarraTopo`: topo com logo e ação de entrar/sair
-- `ContainerPagina`: centraliza e controla largura máxima
-- `BotaoVerde` e `Chip`: padrões visuais reutilizados
-
-### Frontend - Comentários
-
-- No detalhe do artigo, o formulário permite criar comentário e responder (1 nível).
-
-- O detalhe do artigo exibe comentários com paginação de 5 em 5 e botão "Ver mais comentários".
-- Respostas têm apenas 1 nível (responde apenas comentários de topo), seguindo o requisito do desafio.
-
-### Tag principal (frontend)
-
-- Em criar/editar artigo, o campo "Tag principal" é um `select` alimentado pelas tags digitadas (separadas por vírgula).
-- Isso evita inconsistência (tag principal fora da lista de tags) e reduz validações complexas no backend para o MVP.
-
-
-### Correção JSX do select
-
-- Ajustado o componente `select` de Tag principal para evitar erro de build (JSX inválido).
-
-
-### Bugfix: Tag principal
-
-- Corrigido erro no formulário de criar/editar: o select referenciava variáveis inexistentes (`opcoesTags`, `tagPrincipalValida`). Agora as opções são derivadas de `tagsFinal`.
-
-
-### Tag principal na Home
-
-- A listagem (Home) busca a tag principal com um `ORDER BY t.nome ASC` na subquery para garantir consistência caso existam múltiplas tags marcadas como principal por dados legados.
+---
 
 ## Estrutura de pastas
 
 - `backend/`: API Express + SQLite
   - `src/modulos/`: organização por domínio (autenticação, artigos, comentários)
   - `sql/`: schema e seed
+  - `db/`: arquivo do banco (gerado localmente)
 - `frontend/`: Vite + React + Tailwind
-  - `src/app/`: páginas
+  - `src/app/`: páginas (landing, login, home, detalhe, criar, editar)
   - `src/componentes/`: componentes reutilizáveis
   - `src/servicos/`: chamadas HTTP e utilitários
+
+---
+
+## Como rodar o projeto
+
+### Pré-requisitos
+- Node.js 18+ (recomendado)
+- npm
+
+### 1) Backend
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run banco:criar
+npm run banco:seed
+npm run dev
+```
+
+O backend sobe, por padrão, em `http://localhost:3000`.
+
+### 2) Frontend
+```bash
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Configure o arquivo `frontend/.env`:
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+---
+
+## Endpoints (resumo)
+
+> Observação: os nomes exatos das rotas podem variar conforme o arquivo de rotas, mas o padrão do projeto segue esta estrutura.
+
+### Health
+- `GET /health` → `{ ok: true }`
+
+### Autenticação
+- `POST /auth/login`
+  - body: `{ "email": "...", "senha": "..." }`
+  - response: `{ "token": "...", "usuario": { ... } }`
+
+### Artigos
+- `GET /artigos?pagina=1&tamanho=10&busca=...&tag=...`
+- `GET /artigos/:id`
+- `POST /artigos` (privado)
+- `PUT /artigos/:id` (privado, apenas autor)
+- `DELETE /artigos/:id` (privado, apenas autor)
+
+### Comentários
+- `GET /artigos/:id/comentarios?pagina=1&tamanho=5`
+- `POST /artigos/:id/comentarios` (privado)
+- `POST /artigos/:id/comentarios/:comentarioId/respostas` (privado)
+
+---
+
+## Padronização de erros
+
+- Erros de validação retornam mensagens simples e status apropriado.
+- Rotas privadas retornam 401 se token ausente/inválido.
+- Permissões (autor) retornam 403 quando aplicável.
+
+---
+
+## Limitações intencionais (MVP)
+
+- Sem refresh token (token simples).
+- Sem cadastro/gestão de usuários no frontend.
+- Busca simples (sem ranking avançado).
+- Comentários com 1 nível de resposta.
+- SQLite local (sem deploy em produção).
+
+---
+
+## Melhorias possíveis
+
+- Garantir por constraint no banco que apenas 1 tag seja principal por artigo.
+- Testes automatizados.
+- Paginação e busca com melhor UX.
+- Melhor tratamento de erros no frontend.
+- Deploy com Docker ou CI/CD.
