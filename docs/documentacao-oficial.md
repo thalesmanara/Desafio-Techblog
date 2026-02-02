@@ -126,3 +126,13 @@ Componentes base:
 ### Tag principal na Home
 
 - A listagem (Home) busca a tag principal com um `ORDER BY t.nome ASC` na subquery para garantir consistência caso existam múltiplas tags marcadas como principal por dados legados.
+
+## Estrutura de pastas
+
+- `backend/`: API Express + SQLite
+  - `src/modulos/`: organização por domínio (autenticação, artigos, comentários)
+  - `sql/`: schema e seed
+- `frontend/`: Vite + React + Tailwind
+  - `src/app/`: páginas
+  - `src/componentes/`: componentes reutilizáveis
+  - `src/servicos/`: chamadas HTTP e utilitários

@@ -3,3 +3,13 @@ node_modules
 backend/banco.sqlite
 backend/banco.sqlite-journal
 docs/documentacao-particular-entrevista.md
+
+# Arquivos locais
+backend/.env
+frontend/.env
+backend/db/*.db
+backend/db/*.sqlite
+backend/db/*.sqlite3
+
+# Documentação particular (entrevista) - NÃO versionar
+docs/documentacao-particular-entrevista.md
