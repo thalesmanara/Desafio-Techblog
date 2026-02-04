@@ -1,6 +1,12 @@
 # TechBlog MVP
 
-Projeto full stack (Express + SQLite / React + Tailwind) para desafio técnico.
+Aplicação full stack de um blog técnico com:
+- autenticação via JWT (login com usuário pré-carregado via seed)
+- CRUD completo de artigos (listar, detalhar, criar, editar, excluir)
+- tags múltiplas por artigo (exibe a tag principal)
+- comentários com paginação (5 em 5) e respostas com 1 nível (sem árvore infinita)
+
+O foco é um MVP simples, seguro e compatível com o desafio proposto
 
 ## Como rodar
 

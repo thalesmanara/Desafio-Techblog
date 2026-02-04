@@ -68,18 +68,19 @@ export function PaginaDetalheArtigo() {
           <>
             <div className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{artigo.conteudo}</div>
             <ComentariosArtigo artigoId={artigo.id} />
-
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link
-                to={`/artigos/${artigo.id}/editar`}
-                className="text-xs font-semibold text-verde hover:text-verdeEscuro"
-              >
-                Editar artigo
-              </Link>
-              <button onClick={remover} className="text-xs font-semibold text-red-600 hover:text-red-700">
-                Excluir artigo
-              </button>
-            </div>
+{podeGerenciar ? (
+  <div className="mt-8 flex flex-wrap gap-4">
+    <Link
+      to={`/artigos/${artigo.id}/editar`}
+      className="text-xs font-semibold text-verde hover:text-verdeEscuro"
+    >
+      Editar artigo
+    </Link>
+    <button onClick={remover} className="text-xs font-semibold text-red-600 hover:text-red-700">
+      Excluir artigo
+    </button>
+  </div>
+) : null}
           </>
         ) : null}
 
