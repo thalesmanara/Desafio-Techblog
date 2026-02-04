@@ -50,6 +50,8 @@ O foco é um MVP simples, seguro e compatível com um desafio de nível júnior.
 
 ### Artigos
 - CRUD completo.
+- No frontend, os botões de **editar/excluir** só aparecem para o autor do artigo (comparação com o usuário do token JWT).
+
 - Apenas o **autor** pode **editar** e **excluir**.
 - Tags:
   - múltiplas tags por artigo

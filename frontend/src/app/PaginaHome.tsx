@@ -5,6 +5,7 @@ import { ContainerPagina } from '../componentes/ContainerPagina';
 import { BotaoVerde } from '../componentes/BotaoVerde';
 import { Chip } from '../componentes/Chip';
 import { listarArtigos } from '../servicos/artigos';
+import { obterUsuarioDoToken } from '../servicos/autenticacao';
 import { ArtigoResumo } from '../tipos/artigo';
 
 const TAGS_SUGERIDAS = ['Frontend', 'Backend', 'Mobile', 'DevOps', 'AI'];
@@ -56,6 +57,7 @@ function PaginacaoNumerica({
 }
 
 export function PaginaHome() {
+  const usuarioLogado = obterUsuarioDoToken();
   const [pagina, setPagina] = useState(1);
   const [busca, setBusca] = useState('');
   const [tag, setTag] = useState('');
@@ -134,14 +136,16 @@ export function PaginaHome() {
                 ) : null}
               </Link>
 
-              <Link
-                to={`/artigos/${a.id}/editar`}
-                className="grid h-8 w-8 place-items-center rounded-md text-slate-600 hover:bg-slate-100"
-                aria-label="Editar"
-                title="Editar"
-              >
-                <IconeEditar />
-              </Link>
+              {usuarioLogado && a.autor.id === usuarioLogado.id ? (
+                <Link
+                  to={`/artigos/${a.id}/editar`}
+                  className="grid h-8 w-8 place-items-center rounded-md text-slate-600 hover:bg-slate-100"
+                  aria-label="Editar"
+                  title="Editar"
+                >
+                  <IconeEditar />
+                </Link>
+              ) : null}
             </div>
           ))}
 

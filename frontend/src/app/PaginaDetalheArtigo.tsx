@@ -6,6 +6,7 @@ import { BotaoVerde } from '../componentes/BotaoVerde';
 import { detalharArtigo, excluirArtigo } from '../servicos/artigos';
 import { ArtigoDetalhe } from '../tipos/artigo';
 import { ComentariosArtigo } from '../componentes/ComentariosArtigo';
+import { obterUsuarioDoToken } from '../servicos/autenticacao';
 
 export function PaginaDetalheArtigo() {
   const params = useParams();
@@ -33,6 +34,8 @@ export function PaginaDetalheArtigo() {
   }
 
   const tagPrincipal = artigo?.tags.find((t) => t.principal)?.nome ?? '';
+  const usuarioLogado = obterUsuarioDoToken();
+  const podeGerenciar = Boolean(usuarioLogado && artigo && artigo.autor.id === usuarioLogado.id);
 
   return (
     <div className="min-h-screen bg-fundo">
@@ -78,6 +81,10 @@ export function PaginaDetalheArtigo() {
               </button>
             </div>
           </>
+        ) : null}
+
+        {artigo && !podeGerenciar ? (
+          <p className="mt-10 text-xs text-slate-500">Ações de edição e exclusão disponíveis apenas para o autor.</p>
         ) : null}
       </ContainerPagina>
     </div>
